@@ -5,6 +5,9 @@ import docx2txt
 from PIL import Image 
 from PyPDF2 import PdfFileReader
 import pdfplumber
+import FILETOIMAGE.pdftoimage as ftoimage
+import OCR.ocr as ocr
+import PLOTBOX.plotbox as plot
 
 st.write("""
   # Resume Analyser
@@ -44,6 +47,12 @@ if st.button("Process"):
         with open(os.path.join(os.getcwd(),uploaded_files.name),"wb") as f: 
             f.write(uploaded_files.getbuffer())
         st.write("Success Saved")
+        images = ftoimage.filetoimage(uploaded_files.name)
+        image = []
+        for i in images:
+            input = ocr.ImageToText(i)
+            image .append( plot.plotSkills(i , input , ['MYSQL' , 'JAVA' , 'FLASK']) )
+        st.image(image)
 
         # if uploaded_files.type == "text/plain":
         #     # raw_text=uploaded_files.read()
