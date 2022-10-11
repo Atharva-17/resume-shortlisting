@@ -1,5 +1,5 @@
 import streamlit as st
-
+import os
 import pandas as pd
 import docx2txt
 from PIL import Image 
@@ -41,22 +41,26 @@ if st.button("Process"):
         file_details={"filename":uploaded_files.name,
         "filetype":uploaded_files.type,"filesize":uploaded_files.size}
         st.write(file_details)
-        if uploaded_files.type == "text/plain":
-            # raw_text=uploaded_files.read()
-            # st.write(raw_text)
-            raw_text=str(uploaded_files.read(),"utf-8")
-            st.write(raw_text)
-            st.text(raw_text)
-        elif uploaded_files == "application/pdf":
-            try:
-                with pdfplumber.open(uploaded_files) as pdf:
-                    pages = pdf.pages[0]
-                    st.write(pages.extract_text())
-            except:
-                st.write("none")        
-            # raw_text=read_pdf(uploaded_files)
-            # st.write(raw_text)   
-        else:
-            raw_text=docx2txt.process(uploaded_files)
-            st.write(raw_text)
+        with open(os.path.join(os.getcwd(),uploaded_files.name),"wb") as f: 
+            f.write(uploaded_files.getbuffer())
+        st.write("Success Saved")
+
+        # if uploaded_files.type == "text/plain":
+        #     # raw_text=uploaded_files.read()
+        #     # st.write(raw_text)
+        #     raw_text=str(uploaded_files.read(),"utf-8")
+        #     st.write(raw_text)
+        #     st.text(raw_text)
+        # elif uploaded_files == "application/pdf":
+        #     try:
+        #         with pdfplumber.open(uploaded_files) as pdf:
+        #             pages = pdf.pages[0]
+        #             st.write(pages.extract_text())
+        #     except:
+        #         st.write("none")        
+        #     # raw_text=read_pdf(uploaded_files)
+        #     # st.write(raw_text)   
+        # else:
+        #     raw_text=docx2txt.process(uploaded_files)
+        #     st.write(raw_text)
 
