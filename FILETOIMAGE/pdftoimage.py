@@ -4,7 +4,7 @@ import cv2
 import os
 
 def filetoimage(file):
-    poppler_path = r'C:\\Program Files\\poppler-22.04.0\\Library\\bin'
+    poppler_path = r'C:\\Program Files (x86)\\poppler-22.04.0\\Library\\bin'
     images = convert_from_path(file , poppler_path = poppler_path)
     #print(len(images))
     imagesArray= []
