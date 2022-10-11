@@ -1,6 +1,7 @@
 import cv2
 
 def plotSkills(image , imageOut , skills):
+    image = cv2.cvtColor(image , cv2.BGR2RGB)
     n_boxes = len(imageOut['text'])
     for i in range(n_boxes):
         if  (imageOut['text'][i].upper()) in skills:
