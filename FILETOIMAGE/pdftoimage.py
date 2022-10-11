@@ -14,6 +14,6 @@ def filetoimage(file):
         file_path = os.getcwd()
         os.remove('page.png')
     #print(len(imagesArray))
-    return imagesArray
+    return imagesArray , 
     
 
