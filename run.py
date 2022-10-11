@@ -7,4 +7,4 @@ import PLOTBOX.plotbox as plot
 images = ftoimage.filetoimage('resume.pdf')
 for i in images:
     input = ocr.ImageToText(i)
-    plot.plotSkills(i , input , ['MYSQL' , 'JAVA' , 'FLASK'])
+    image = plot.plotSkills(i , input , ['MYSQL' , 'JAVA' , 'FLASK'])
