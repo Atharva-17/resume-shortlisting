@@ -8,6 +8,8 @@ import pdfplumber
 import FILETOIMAGE.pdftoimage as ftoimage
 import OCR.ocr as ocr
 import PLOTBOX.plotbox as plot
+import RESUMEANALYSIS.analyze  as analysis
+import cv2
 
 st.write("""
   # Resume Analyser
@@ -51,8 +53,10 @@ if st.button("Process"):
         image = []
         for i in images:
             input = ocr.ImageToText(i)
-            image .append( plot.plotSkills(i , input , ['MYSQL' , 'JAVA' , 'FLASK']) )
-        st.image(image)
+            skills , phone = analysis.analyze(input)
+            # image .append( plot.plotSkills(i , input , analysis.SKILLS_DB) )
+            st.write(skills)
+            st.image(cv2.cvtColor(i , cv2.COLOR_BGR2RGB))
 
         # if uploaded_files.type == "text/plain":
         #     # raw_text=uploaded_files.read()
