@@ -1,10 +1,10 @@
 import streamlit as st
 import os
 import pandas as pd
-import docx2txt
+#import docx2txt
 from PIL import Image 
 from PyPDF2 import PdfFileReader
-import pdfplumber
+#import pdfplumber
 import FILETOIMAGE.pdftoimage as ftoimage
 import OCR.ocr as ocr
 import PLOTBOX.plotbox as plot
@@ -54,9 +54,9 @@ if st.button("Process"):
         for i in images:
             input = ocr.ImageToText(i)
             skills , phone = analysis.analyze(input)
-            # image .append( plot.plotSkills(i , input , analysis.SKILLS_DB) )
+            image .append( plot.plotSkills(i , input , analysis.SKILLS_DB) )
             st.write(skills)
-            st.image(cv2.cvtColor(i , cv2.COLOR_BGR2RGB))
+            st.image(image)
 
         # if uploaded_files.type == "text/plain":
         #     # raw_text=uploaded_files.read()

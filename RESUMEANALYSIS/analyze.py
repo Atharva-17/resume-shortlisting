@@ -3,7 +3,7 @@ import re
 nltk.download('stopwords')
 nltk.download('punkt')
 
-SKILLS_DB =['machine learning' , 'data science' , 'pyhton' , 'word' , 'mongodb' 'flask' , 'php' , 'mysql' , 'css' ,'react' , 'html' , 'aws' , 'jira' , 'git' , 'figma' , 'UI/UX']
+SKILLS_DB =['machine learning' , 'data science' , 'pyhton' , 'word' , 'mongodb', 'flask' , 'php' , 'mysql' , 'css' ,'react' , 'html' , 'aws' , 'jira' , 'git' , 'figma' , 'UI/UX' , 'sql']
 def extract_skills(text):
     stop_words = set(nltk.corpus.stopwords.words('english'))
     word_tokens = nltk.tokenize.word_tokenize(text)
@@ -39,6 +39,7 @@ def extract_phone_number(resume_text):
         if resume_text.find(number) >= 0 and len(number) < 16:
             return number
     return None
+
 def analyze(imageOut):
     input = ""
     for i in imageOut['text']:
