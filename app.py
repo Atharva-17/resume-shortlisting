@@ -1,4 +1,3 @@
-from turtle import width
 import streamlit as st
 import os
 import pandas as pd
@@ -11,6 +10,7 @@ import OCR.ocr as ocr
 import PLOTBOX.plotbox as plot
 import RESUMEANALYSIS.analyze  as analysis
 import cv2
+import MATCHTOROLES.matchroles as mr
 st.set_page_config(layout="wide")
 st.write("""
   # Resume Analyser
@@ -45,9 +45,14 @@ uploaded_skills_files = skills_panel.file_uploader("Choose a file", type=["csv"]
 #     st.markdown(pdf_display, unsafe_allow_html=True)
 
 # show_pdf(uploaded_file.name)
+
+skills_dataframe :pd.DataFrame
 if skills_panel.button("Process Skills"):
     if uploaded_skills_files is not None:
-        skills_panel.write("Hello")
+        with open(os.path.join(os.getcwd(),"skills.csv"),"wb") as f: 
+                f.write(uploaded_skills_files.getbuffer())
+        #skills_dataframe = pd.read_csv(os.path.join(os.getcwd() , uploaded_skills_files.name))
+        skills_panel.write("SKILLS UPLOADED")
     else:
         skills_panel.warning("please upload a file")
 
@@ -64,14 +69,40 @@ if resume_panel.button("Process"):
             resume_panel.write("Success Saved")
             images = ftoimage.filetoimage(uploaded_file.name)
             image = []
-            for i in images:
-                input = ocr.ImageToText(i)
-                skills , phone = analysis.analyze(input)
-                image.append( plot.plotSkills(i , input , skills) )
-                resume_panel.write(skills)
-                resume_panel.image(image)
-            os.remove(os.path.join(os.getcwd(),uploaded_file.name))
+            skills_person = []
+            phone = ""
+            name = ""
+            email =""
+            roles = mr.roleNames()
+            heading = st.columns(len(roles) + 1)
+            heading[0].write("NAME")
+            for i in range(len(roles)):
+                heading[i+1].write(roles[i])
+            for i in range(len(images)):
+                input = ocr.ImageToText(images[i])
+                if i == 0:
+                    name , email , phone = analysis.analyzeFirst(uploaded_file.name)
+                skills ,phone = analysis.analyze(input)
+                skills_person = skills_person + list(skills)
+                image.append( plot.plotSkills(images[i] , input , skills) )
 
+            matchArr = mr.calculate(skills_person)
+            st.write(len(matchArr) + 1)
+            #st.write(skills_dataframe)
+            col = st.columns(len(matchArr) + 1)
+            col[0].write(name)
+            for cn in range(len(matchArr)):
+                col[cn+1].write( matchArr[cn])
+            with st.expander("See " + name + "'s " + "Resume"):
+                st.write("Name          : " +  name)
+                st.write("Email         : " + email)
+                st.write("Phone_Number  : " + phone)
+                st.write(skills)
+                st.image(image)
+
+            os.remove(os.path.join(os.getcwd(),uploaded_file.name))
+    else:
+        resume_panel.warning("Please upload CSV file first")
         # if uploaded_files.type == "text/plain":
         #     # raw_text=uploaded_files.read()
         #     # st.write(raw_text)

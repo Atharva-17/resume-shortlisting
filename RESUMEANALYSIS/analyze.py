@@ -1,9 +1,14 @@
 import nltk
 import re
+# from pyresparser import ResumeParser
+
 nltk.download('stopwords')
 nltk.download('punkt')
 
-SKILLS_DB =['machine learning' , 'data science' , 'pyhton' , 'word' , 'mongodb', 'flask' , 'php' , 'mysql' , 'css' ,'react' , 'html' , 'aws' , 'jira' , 'git' , 'figma' , 'UI/UX' , 'sql']
+SKILLS_DB =['machine learning' , 'data science' , 'pyhton' , 'word' , 'mongodb', 'flask' , 'php' , 'mysql' , 'css' ,'react' , 'html' , 'aws' , 'jira' , 'git' , 'figma' , 'UI/UX' , 'sql' ,'java' , 'cnn' , 'backend' , 'python' , 'node' , 'node.js']
+# def analyzeFirst(filename):
+#     data = ResumeParser(filename).get_extracted_data()
+#     return data['name'] , data['email'] , data['mobile_number']
 def extract_skills(text):
     stop_words = set(nltk.corpus.stopwords.words('english'))
     word_tokens = nltk.tokenize.word_tokenize(text)
