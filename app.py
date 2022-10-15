@@ -1,3 +1,4 @@
+from turtle import width
 import streamlit as st
 import os
 import pandas as pd
@@ -10,11 +11,14 @@ import OCR.ocr as ocr
 import PLOTBOX.plotbox as plot
 import RESUMEANALYSIS.analyze  as analysis
 import cv2
-
+st.set_page_config(layout="wide")
 st.write("""
   # Resume Analyser
-  Hello World!
 """)
+skills_panel , resume_panel = st.columns(2)
+skills_panel.header("Skills")
+resume_panel.header("Resume")
+
 
 
 def read_pdf(file):
@@ -27,7 +31,8 @@ def read_pdf(file):
 
 	return all_page_text
 
-uploaded_files = st.file_uploader("Choose a file", type=["pdf","docx","txt"])
+uploaded_files = resume_panel.file_uploader("Choose a file", type=["pdf","docx","txt"] , accept_multiple_files=True)
+uploaded_skills_files = skills_panel.file_uploader("Choose a file", type=["csv"] , accept_multiple_files=False)
 # for uploaded_file in uploaded_files:
 #     bytes_data = uploaded_file.read()
 #     st.write("filename:", uploaded_file.name)
@@ -40,23 +45,32 @@ uploaded_files = st.file_uploader("Choose a file", type=["pdf","docx","txt"])
 #     st.markdown(pdf_display, unsafe_allow_html=True)
 
 # show_pdf(uploaded_file.name)
+if skills_panel.button("Process Skills"):
+    if uploaded_skills_files is not None:
+        skills_panel.write("Hello")
+    else:
+        skills_panel.warning("please upload a file")
 
-if st.button("Process"):
+
+
+if resume_panel.button("Process"):
     if uploaded_files is not None:
-        file_details={"filename":uploaded_files.name,
-        "filetype":uploaded_files.type,"filesize":uploaded_files.size}
-        st.write(file_details)
-        with open(os.path.join(os.getcwd(),uploaded_files.name),"wb") as f: 
-            f.write(uploaded_files.getbuffer())
-        st.write("Success Saved")
-        images = ftoimage.filetoimage(uploaded_files.name)
-        image = []
-        for i in images:
-            input = ocr.ImageToText(i)
-            skills , phone = analysis.analyze(input)
-            image .append( plot.plotSkills(i , input , analysis.SKILLS_DB) )
-            st.write(skills)
-            st.image(image)
+        for uploaded_file in uploaded_files:
+            file_details={"filename":uploaded_file.name,
+            "filetype":uploaded_file.type,"filesize":uploaded_file.size}
+            #st.write(file_details)
+            with open(os.path.join(os.getcwd(),uploaded_file.name),"wb") as f: 
+                f.write(uploaded_file.getbuffer())
+            resume_panel.write("Success Saved")
+            images = ftoimage.filetoimage(uploaded_file.name)
+            image = []
+            for i in images:
+                input = ocr.ImageToText(i)
+                skills , phone = analysis.analyze(input)
+                image.append( plot.plotSkills(i , input , skills) )
+                resume_panel.write(skills)
+                resume_panel.image(image)
+            os.remove(os.path.join(os.getcwd(),uploaded_file.name))
 
         # if uploaded_files.type == "text/plain":
         #     # raw_text=uploaded_files.read()

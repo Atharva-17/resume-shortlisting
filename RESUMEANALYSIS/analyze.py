@@ -17,14 +17,12 @@ def extract_skills(text):
     found_skills = set()
 
     for token in filtered_tokens:
-        print(token)
         if token.lower() in SKILLS_DB:
-            found_skills.add(token)
+            found_skills.add(token.lower())
 
     for ngram in bigrams_trigrams:
-        print(ngram)
         if ngram.lower() in SKILLS_DB:
-            found_skills.add(ngram)
+            found_skills.add(ngram.lower())
 
     return found_skills
 
