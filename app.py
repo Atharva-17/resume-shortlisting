@@ -11,6 +11,7 @@ import PLOTBOX.plotbox as plot
 import RESUMEANALYSIS.analyze  as analysis
 import cv2
 import MATCHTOROLES.matchroles as mr
+import xlsxwriter as xl
 st.set_page_config(layout="wide")
 st.write("""
   # Resume Analyser
@@ -60,47 +61,62 @@ if skills_panel.button("Process Skills"):
 
 if resume_panel.button("Process"):
     if uploaded_files is not None:
+        result_work = xl.Workbook("results.xlsx")
+        result_sheet = result_work.add_worksheet()
+        roles = mr.roleNames()
+        row = 1
+        result_sheet.write(0 , 0 , "Email")
+        result_sheet.write(0 , 1 , "Phone Number")
+        result_sheet.write(0 , 2 , "Skills")
+        for r  in range(len(roles)):
+            result_sheet.write(0 , r + 3 , roles[r])
         for uploaded_file in uploaded_files:
             file_details={"filename":uploaded_file.name,
             "filetype":uploaded_file.type,"filesize":uploaded_file.size}
             #st.write(file_details)
+            
             with open(os.path.join(os.getcwd(),uploaded_file.name),"wb") as f: 
                 f.write(uploaded_file.getbuffer())
-            resume_panel.write("Success Saved")
+            # resume_panel.write("Success Saved")
             images = ftoimage.filetoimage(uploaded_file.name)
             image = []
             skills_person = []
             phone = ""
             name = ""
             email =""
-            roles = mr.roleNames()
-            heading = st.columns(len(roles) + 1)
-            heading[0].write("NAME")
-            for i in range(len(roles)):
-                heading[i+1].write(roles[i])
             for i in range(len(images)):
                 input = ocr.ImageToText(images[i])
                 if i == 0:
-                    name , email , phone = analysis.analyzeFirst(uploaded_file.name)
-                skills ,phone = analysis.analyze(input)
+                    email , phone = analysis.analyzeFirst(input)
+                skills = analysis.analyze(input)
                 skills_person = skills_person + list(skills)
-                image.append( plot.plotSkills(images[i] , input , skills) )
+                image.append( plot.plotAll(images[i] , input , skills , email , phone) )
 
             matchArr = mr.calculate(skills_person)
-            st.write(len(matchArr) + 1)
+            # st.write(len(matchArr) + 1)
             #st.write(skills_dataframe)
-            col = st.columns(len(matchArr) + 1)
-            col[0].write(name)
+            #col = st.columns(len(matchArr) + 1)
+            if(email is not None):
+                st.write( "Email : "+ email )
+                result_sheet.write(row , 0 , email)
+            if(phone is not None):
+                result_sheet.write(row , 1 , phone)
+            result_sheet.write(row, 2 , ",".join(skills_person))
             for cn in range(len(matchArr)):
-                col[cn+1].write( matchArr[cn])
+                result_sheet.write(row , cn + 3 , matchArr[cn]) 
+                st.write(  roles[cn] + " : " + str(matchArr[cn]) )
+            
             with st.expander("See " + name + "'s " + "Resume"):
-                st.write("Name          : " +  name)
-                st.write("Email         : " + email)
-                st.write("Phone_Number  : " + phone)
-                st.write(skills)
+                if(email is not None):
+                    st.write("Email         : " + email)
+                if(phone is not None):
+                    st.write("Phone_Number  : " + phone)
+                st.write(skills_person)
                 st.image(image)
 
             os.remove(os.path.join(os.getcwd(),uploaded_file.name))
+            row += 1
+        result_work.close()
     else:
         resume_panel.warning("Please upload CSV file first")
         # if uploaded_files.type == "text/plain":
